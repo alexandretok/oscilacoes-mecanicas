@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+    <script type="text/javascript" src="numeric.js"></script>
+</head>
+<body onload="inicializar()">
+    <canvas id="canvas" width="800" height="480">
+        Navegador não suporta HTML5
+    </canvas>
+    <p>
+        mX.. + Kx = 0
+    </p>
+    <script type="text/javascript">
+        var massaAltura, massaLargura, massa, massaPosicaoX, massaVelocidade, kMola, x0, xp, teta;
+
+        function edo(t,x){
+            return kMola * x / massa;
+        }
+
+        function inicializar() {
+            massaAltura = 250;
+            massaLargura = 250;
+
+            x0 = 100;
+            xp = 0;
+
+            kMola = 100;
+
+            teta = 0;
+
+            massa = 100;
+
+            massaPosicaoX = (canvas.width - massaLargura);
+
+            canvas = document.getElementById("canvas");
+            context = canvas.getContext("2d");
+
+            /*addEventListener('keydown', keyDown);*/
+
+            setInterval(draw, 10);
+            setInterval(changeValues, 30);
+
+            sol = numeric.dopri(0, 1, 1, edo);
+            console.log(sol);
+        }
+
+        function changeValues(){
+            teta += 50;
+            massaPosicaoX += Math.sin(teta) * 30;
+        }
+
+        function draw(){
+            context.clearRect(0, 0, canvas.width, canvas.height); /* Limpa a tela */
+            context.fillRect(massaPosicaoX, canvas.height - massaAltura, massaLargura, massaAltura); /* Desenha a posicao do jogar */
+
+            context.beginPath();
+            xAtual = 0;
+            yAtual = canvas.height - massaAltura/2;
+            context.moveTo(xAtual, yAtual);
+            context.lineTo(xAtual += 120, yAtual);
+            context.lineTo(xAtual += 10, yAtual += 25);
+            context.lineTo(xAtual += 10, yAtual -= 50);
+            context.lineTo(xAtual += 10, yAtual += 50);
+            context.lineTo(xAtual += 10, yAtual -= 50);
+            context.lineTo(xAtual += 10, yAtual += 50);
+            context.lineTo(xAtual += 10, yAtual -= 50);
+            context.lineTo(xAtual += 10, yAtual += 50);
+            context.lineTo(xAtual += 10, yAtual -= 50);
+            context.lineTo(xAtual += 10, yAtual += 50);
+            context.lineTo(xAtual += 10, yAtual -= 50);
+            context.lineTo(xAtual += 10, yAtual += 50);
+            context.lineTo(xAtual += 10, yAtual -= 50);
+            context.lineTo(xAtual += 10, yAtual += 50);
+            context.lineTo(xAtual += 10, yAtual -= 50);
+            context.lineTo(xAtual += 10, yAtual += 50);
+            context.lineTo(xAtual += 10, yAtual -= 50);
+            context.lineTo(xAtual += 10, yAtual += 25);
+            context.lineTo(massaPosicaoX, canvas.height - massaAltura/2);
+            context.stroke();
+        }
+    </script>
+</body>
+</html>
