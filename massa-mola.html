@@ -18,44 +18,42 @@
         mX.. + Kx = 0
     </p>
     <script type="text/javascript">
-        var massaAltura, massaLargura, massa, massaPosicaoX, massaVelocidade, kMola, x0, xp, teta;
-
-        function edo(t,x){
-            return kMola * x / massa;
-        }
+        var canvas, d,  context, tempo, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp, teta;
 
         function inicializar() {
             massaAltura = 200;
             massaLargura = 200;
 
-            x0 = 100;
+            x0 = 0.1;
             xp = 0;
 
-            kMola = 100;
-
-            teta = 0;
-
-            massa = 100;
+            kMola = 10;
+            massa = 10;
 
             massaPosicaoX = 400;
             massaPosicaoXOriginal = 400;
+
+            tempoDeAtualizacaoDoCanvas = 30;
+            tempo = 0;
 
             canvas = document.getElementById("canvas");
             context = canvas.getContext("2d");
             context.font = "bold 16px Arial";
 
-            /*addEventListener('keydown', keyDown);*/
+            addEventListener('keydown', keyDown);
 
-            setInterval(draw, 10);
-            setInterval(changeValues, 30);
-
-            sol = numeric.dopri(0, 1, 1, edo);
-            console.log(sol);
+            d = setInterval(draw, tempoDeAtualizacaoDoCanvas);
+            setInterval(changeValues, tempoDeAtualizacaoDoCanvas);
         }
 
         function changeValues(){
-            teta += 50;
-            massaPosicaoX += Math.sin(teta) * 30;
+            tempo += tempoDeAtualizacaoDoCanvas/100;
+            massaPosicaoX += Math.sin(tempo) * 30;
+        }
+
+        function keyDown(e){
+            if(e.keyCode == 39)
+                clearInterval(d);
         }
 
         function draw(){
@@ -66,48 +64,44 @@
             context.beginPath();
             alturaEscala = canvas.height - massaAltura - 10;
             context.moveTo(0, alturaEscala);
-            context.fillText("0", 0, alturaEscala - 10);
             context.lineTo(canvas.width, alturaEscala);
-            context.moveTo(100, alturaEscala - 5);
-            context.lineTo(100, alturaEscala + 5);
-            context.fillText("1", 95, alturaEscala - 10);
-            context.moveTo(200, alturaEscala - 5);
-            context.lineTo(200, alturaEscala + 5);
-            context.fillText("2", 195, alturaEscala - 10);
-            context.moveTo(300, alturaEscala - 5);
-            context.lineTo(300, alturaEscala + 5);
-            context.fillText("3", 295, alturaEscala - 10);
-            context.moveTo(400, alturaEscala - 5);
-            context.lineTo(400, alturaEscala + 5);
-            context.fillText("4", 395, alturaEscala - 10);
-            context.moveTo(500, alturaEscala - 5);
-            context.lineTo(500, alturaEscala + 5);
-            context.fillText("5", 495, alturaEscala - 10);
-            context.moveTo(600, alturaEscala - 5);
-            context.lineTo(600, alturaEscala + 5);
-            context.fillText("6", 595, alturaEscala - 10);
-            context.moveTo(700, alturaEscala - 5);
-            context.lineTo(700, alturaEscala + 5);
-            context.fillText("7", 695, alturaEscala - 10);
-            context.fillText("8", 790, alturaEscala - 10);
+            for(i=0;i<=canvas.width;i+=100){
+                context.moveTo(i, alturaEscala);
+                if(i == 0)
+                    back = 0;
+                else if(i == canvas.width)
+                    back = i - 10;
+                else back = i - 5;
+                context.fillText(i/100, back, alturaEscala - 10);
+                context.moveTo(i, alturaEscala - 5);
+                context.lineTo(i, alturaEscala + 5);
+            }
+
 
             /* Desenhando a mola */
-            /* A mola possui 5 circunferencias */
+            /* A mola possui 5 aspirais */
             xAtual = 0;
             yAtual = canvas.height - massaAltura/2;
             y0 = yAtual;
-
+            nAspirais = 10;
+            comprimentoAspiral = 7;
+            deslocamentoXPixels = (massaPosicaoX - massaPosicaoXOriginal) + 100;
+            deslocamentoXPorAspiral = deslocamentoXPixels/(nAspirais*2);
+            deslocamentoYPorAspiral = comprimentoAspiral*comprimentoAspiral - Math.sqrt(Math.pow(deslocamentoXPorAspiral, 2));
 
             context.moveTo(xAtual, yAtual);
-            context.lineTo(xAtual += 20, yAtual);
-            context.lineTo(xAtual += massaPosicaoX*0.1, yAtual -= (massaPosicaoX - massaPosicaoXOriginal)*0.4);
-            context.lineTo(xAtual += massaPosicaoX*0.1/2, yAtual = y0);
-            context.lineTo(xAtual += massaPosicaoX*0.1/2, yAtual += (massaPosicaoX - massaPosicaoXOriginal)*0.4);
-            context.lineTo(xAtual += massaPosicaoX*0.1/2, yAtual = y0);
-            context.lineTo(xAtual += massaPosicaoX*0.1/2, yAtual -= (massaPosicaoX - massaPosicaoXOriginal)*0.4);
-            context.lineTo(xAtual += massaPosicaoX*0.1/2, yAtual = y0);
-            context.lineTo(xAtual += massaPosicaoX*0.1/2, yAtual += (massaPosicaoX - massaPosicaoXOriginal)*0.4);
-            context.lineTo(xAtual += massaPosicaoX*0.1/2, yAtual = y0);
+            context.lineTo(xAtual += 100, yAtual);
+
+            for(i=0;i<nAspirais/2;i++) {
+                /* Desenha as espirais */
+                context.lineTo(xAtual += deslocamentoXPorAspiral, yAtual += deslocamentoYPorAspiral);
+                context.lineTo(xAtual += deslocamentoXPorAspiral, yAtual = y0);
+                context.lineTo(xAtual += deslocamentoXPorAspiral, yAtual -= deslocamentoYPorAspiral);
+                context.lineTo(xAtual += deslocamentoXPorAspiral, yAtual = y0);
+            }
+
+            context.lineTo(massaPosicaoX, yAtual);
+
 
             context.stroke();
         }
