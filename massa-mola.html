@@ -5,10 +5,13 @@
     <title></title>
     <style type="text/css">
         canvas {
-            border: 1px solid black;
+            border: 2px solid grey;
+            vertical-align: middle;
+        }
+        #crate {
+            display: none;
         }
     </style>
-    <script type="text/javascript" src="numeric.js"></script>
 </head>
 <body onload="inicializar()">
     <canvas id="canvas" width="800" height="250">
@@ -19,8 +22,9 @@
         <br/>
         x૰ = 100;
     </p>
+    <img id="crate" src="crate.png">
     <script type="text/javascript">
-        var canvas, velocidadeAnimacao, drawInterval,  context, tempo, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp, teta;
+        var canvas, imgCaixa, velocidadeAnimacao, drawInterval,  context, tempo, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp, teta;
 
         function inicializar() {
             massaAltura = 200;
@@ -38,6 +42,8 @@
             tempoDeAtualizacaoDoCanvas = 30;
             velocidadeAnimacao = 150;
             tempo = 90;
+
+            imgCaixa = document.getElementById("crate");
 
             canvas = document.getElementById("canvas");
             context = canvas.getContext("2d");
@@ -101,6 +107,7 @@
                 context.lineTo(i, alturaEscala + 5);
             }
 
+            context.drawImage(imgCaixa, massaPosicaoX, canvas.height - massaAltura);
 
             /* Desenhando a mola */
             /* A mola possui 5 aspirais */
@@ -116,6 +123,8 @@
             context.moveTo(xAtual, yAtual);
             context.lineTo(xAtual += 100, yAtual);
 
+            deslocamentoXPorAspiral += 2;
+
             for(i=0;i<nAspirais/2;i++) {
                 /* Desenha as espirais */
                 context.lineTo(xAtual += deslocamentoXPorAspiral, yAtual += deslocamentoYPorAspiral);
@@ -123,6 +132,9 @@
                 context.lineTo(xAtual += deslocamentoXPorAspiral, yAtual -= deslocamentoYPorAspiral);
                 context.lineTo(xAtual += deslocamentoXPorAspiral, yAtual = y0);
             }
+
+            context.fillText("k = " + kMola + " N/m", 10, y0 - 10);
+            context.fillText("m = " + massa + " kg", massaPosicaoX - 100, y0 - 10);
 
             context.lineTo(massaPosicaoX, yAtual);
             context.stroke();
