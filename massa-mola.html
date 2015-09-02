@@ -6,7 +6,7 @@
     <style type="text/css">
         canvas {
             border: 2px solid grey;
-            vertical-align: middle;
+            background-color: #E6F9FF;
         }
         #crate {
             display: none;
@@ -14,7 +14,7 @@
     </style>
 </head>
 <body onload="inicializar()">
-    <canvas id="canvas" width="800" height="250">
+    <canvas id="canvas" width="700" height="270">
         Navegador não suporta HTML5
     </canvas>
     <p>
@@ -30,8 +30,8 @@
             massaAltura = 200;
             massaLargura = 200;
 
-            x0 = 100;
-            xp = 0;
+            x0 = 100;   /* Posicao inicial */
+            xp = 0;     /* Velocidade inicial */
 
             kMola = 10;
             massa = 10;
@@ -43,11 +43,11 @@
             velocidadeAnimacao = 150;
             tempo = 90;
 
-            imgCaixa = document.getElementById("crate");
-
             canvas = document.getElementById("canvas");
             context = canvas.getContext("2d");
             context.font = "bold 16px Arial";
+
+            imgCaixa = document.getElementById("crate");
 
             addEventListener('keydown', keyDown);
 
@@ -59,6 +59,8 @@
             massaPosicaoX = massaPosicaoXOriginal + Math.sin(tempo) * 100;
         }
 
+
+        /* Funcao para permitir ao usuario controlar algumas caracteristicas da simulacao */
         function keyDown(e){
 //            console.log(e.keyCode);
             if(e.keyCode == 32) {
@@ -89,10 +91,12 @@
         function draw(){
             context.clearRect(0, 0, canvas.width, canvas.height); /* Limpa a tela */
             context.fillRect(massaPosicaoX, canvas.height - massaAltura, massaLargura, massaAltura); /* Desenha a posicao do jogar */
+
+
             /*Desenhando a escala na parte superior*/
             /*Cada ponto na escala equivale a 100px */
             context.beginPath();
-            alturaEscala = canvas.height - massaAltura - 10;
+            alturaEscala = canvas.height - massaAltura - 5;
             context.moveTo(0, alturaEscala);
             context.lineTo(canvas.width, alturaEscala);
             for(i=0;i<=canvas.width;i+=100){
@@ -133,8 +137,11 @@
                 context.lineTo(xAtual += deslocamentoXPorAspiral, yAtual = y0);
             }
 
+
+            /* Escrevendo informacoes do sistema */
             context.fillText("k = " + kMola + " N/m", 10, y0 - 10);
             context.fillText("m = " + massa + " kg", massaPosicaoX - 100, y0 - 10);
+            context.fillText("Equação do sistema:   m۰Ẍ + K۰x = 0", 10, 25);
 
             context.lineTo(massaPosicaoX, yAtual);
             context.stroke();
