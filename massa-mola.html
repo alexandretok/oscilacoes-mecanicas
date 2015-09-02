@@ -15,26 +15,29 @@
         Navegador não suporta HTML5
     </canvas>
     <p>
-        mX.. + Kx = 0
+        m۰Ẍ + K۰x = 0
+        <br/>
+        x૰ = 100;
     </p>
     <script type="text/javascript">
-        var canvas, d,  context, tempo, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp, teta;
+        var canvas, velocidadeAnimacao, drawInterval,  context, tempo, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp, teta;
 
         function inicializar() {
             massaAltura = 200;
             massaLargura = 200;
 
-            x0 = 0.1;
+            x0 = 100;
             xp = 0;
 
             kMola = 10;
             massa = 10;
 
-            massaPosicaoX = 400;
             massaPosicaoXOriginal = 400;
+            massaPosicaoX = 400 + x0;
 
             tempoDeAtualizacaoDoCanvas = 30;
-            tempo = 0;
+            velocidadeAnimacao = 150;
+            tempo = 90;
 
             canvas = document.getElementById("canvas");
             context = canvas.getContext("2d");
@@ -42,18 +45,39 @@
 
             addEventListener('keydown', keyDown);
 
-            d = setInterval(draw, tempoDeAtualizacaoDoCanvas);
-            setInterval(changeValues, tempoDeAtualizacaoDoCanvas);
+            drawInterval = setInterval(draw, tempoDeAtualizacaoDoCanvas);
         }
 
         function changeValues(){
-            tempo += tempoDeAtualizacaoDoCanvas/100;
-            massaPosicaoX += Math.sin(tempo) * 30;
+            tempo += tempoDeAtualizacaoDoCanvas/velocidadeAnimacao;
+            massaPosicaoX = massaPosicaoXOriginal + Math.sin(tempo) * 100;
         }
 
         function keyDown(e){
-            if(e.keyCode == 39)
-                clearInterval(d);
+//            console.log(e.keyCode);
+            if(e.keyCode == 32) {
+
+                if(drawInterval){
+                    clearInterval(drawInterval);
+                    drawInterval = false;
+                }else{
+                    drawInterval = setInterval(draw, tempoDeAtualizacaoDoCanvas);
+                }
+            }
+
+
+            if(e.keyCode == 37){
+                if(velocidadeAnimacao < 400) {
+                    velocidadeAnimacao += 20;
+                }
+            }
+
+            if(e.keyCode == 39){
+                if(velocidadeAnimacao > 60) {
+                    velocidadeAnimacao -= 20;
+                }
+            }
+            console.log(velocidadeAnimacao);
         }
 
         function draw(){
@@ -101,9 +125,9 @@
             }
 
             context.lineTo(massaPosicaoX, yAtual);
-
-
             context.stroke();
+
+            changeValues();
         }
     </script>
 </body>
