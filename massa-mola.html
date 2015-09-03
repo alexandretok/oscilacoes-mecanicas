@@ -12,14 +12,43 @@
             display: none;
         }
     </style>
+    <script type="text/javascript" src="js/jquery.js"></script>
 </head>
-<body onload="inicializar()">
-    <canvas id="canvas" width="700" height="270">
+<body>
+    <canvas id="canvas" width="1000" height="270">
         Navegador não suporta HTML5
     </canvas>
+    <div>
+        <p>
+            <label for="kMola">Coeficiente de Elasticidade</label> <input type="range" max="100" min="1" id="kMola">
+        </p>
+        <p>
+            <label for="massa">Massa</label> <input type="range" max="100" min="1" id="massa">
+        </p>
+        <p>
+            <label for="velocidade">Velocidade da Simulacao</label> <input type="range" max="500" min="100" id="velocidade">
+        </p>
+    </div>
     <img id="crate" src="crate.png">
     <script type="text/javascript">
-        var canvas, imgCaixa, velocidadeAnimacao, drawInterval,  context, tempo, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp, teta;
+        $(document).ready(function(){
+            inicializar();
+            /* Iniciando os controles dos valores do sistema */
+            $('#kMola').val(kMola);
+            $('#massa').val(massa);
+            $('#velocidade').val(velocidadeAnimacao);
+            /* Eventos de alteracao dos valores do sistema */
+            $('#kMola').change(function(){
+                kMola = this.value;
+            });
+            $('#massa').change(function(){
+                massa = this.value;
+            });
+            $('#velocidade').change(function(){
+                velocidadeAnimacao = this.value;
+            });
+        });
+        var canvas, rangeKMola, imgCaixa, velocidadeAnimacao, drawInterval,  context, tempo, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp;
 
         function inicializar() {
             massaAltura = 200;
@@ -31,11 +60,11 @@
             kMola = 10;
             massa = 10;
 
-            massaPosicaoXOriginal = 400;
-            massaPosicaoX = 400 + x0;
+            massaPosicaoXOriginal = 600;
+            massaPosicaoX = x0 + massaPosicaoXOriginal;
 
             tempoDeAtualizacaoDoCanvas = 30;
-            velocidadeAnimacao = 150;
+            velocidadeAnimacao = 150; /* Padrao = 150 */
             tempo = 90;
 
             canvas = document.getElementById("canvas");
@@ -46,12 +75,12 @@
 
             addEventListener('keydown', keyDown);
 
-            drawInterval = setInterval(draw, tempoDeAtualizacaoDoCanvas);
+            drawInterval = setInterval(draw, tempoDeAtualizacaoDoCanvas)
         }
 
         function changeValues(){
             tempo += tempoDeAtualizacaoDoCanvas/velocidadeAnimacao;
-            massaPosicaoX = massaPosicaoXOriginal + Math.sin(tempo) * 100;
+            massaPosicaoX = massaPosicaoXOriginal + x0 * Math.sin(Math.sqrt(kMola) * tempo / Math.sqrt(massa)) + xp * Math.cos(Math.sqrt(kMola) * tempo / Math.sqrt(massa));
         }
 
 
@@ -99,7 +128,7 @@
                 if(i == 0)
                     back = 0;
                 else if(i == canvas.width)
-                    back = i - 10;
+                    back = i - 20;
                 else back = i - 5;
                 context.fillText(i/100, back, alturaEscala - 10);
                 context.moveTo(i, alturaEscala - 5);
@@ -109,18 +138,17 @@
             context.drawImage(imgCaixa, massaPosicaoX, canvas.height - massaAltura);
 
             /* Desenhando a mola */
-            /* A mola possui 5 aspirais */
             xAtual = 0;
             yAtual = canvas.height - massaAltura/2;
             y0 = yAtual;
-            nAspirais = 10;
-            comprimentoAspiral = 7;
+            nAspirais = 15;
+            comprimentoAspiral = 8;
             deslocamentoXPixels = (massaPosicaoX - massaPosicaoXOriginal) + 100;
             deslocamentoXPorAspiral = deslocamentoXPixels/(nAspirais*2);
             deslocamentoYPorAspiral = comprimentoAspiral*comprimentoAspiral - Math.sqrt(Math.pow(deslocamentoXPorAspiral, 2));
 
             context.moveTo(xAtual, yAtual);
-            context.lineTo(xAtual += 100, yAtual);
+            context.lineTo(xAtual += 200, yAtual);
 
             deslocamentoXPorAspiral += 2;
 
