@@ -28,6 +28,9 @@
         <p>
             <label for="velocidade">Velocidade da Simulacao</label> <input type="range" max="500" min="100" id="velocidade">
         </p>
+        <p>
+            <button id="pause">Pause</button>
+        </p>
     </div>
     <img id="crate" src="crate.png">
     <script type="text/javascript">
@@ -46,6 +49,14 @@
             });
             $('#velocidade').change(function(){
                 velocidadeAnimacao = this.value;
+            });
+            $('#pause').click(function () {
+                if(drawInterval){
+                    clearInterval(drawInterval);
+                    drawInterval = false;
+                }else{
+                    drawInterval = setInterval(draw, tempoDeAtualizacaoDoCanvas);
+                }
             });
         });
         var canvas, rangeKMola, imgCaixa, velocidadeAnimacao, drawInterval,  context, tempo, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp;
@@ -73,43 +84,12 @@
 
             imgCaixa = document.getElementById("crate");
 
-            addEventListener('keydown', keyDown);
-
             drawInterval = setInterval(draw, tempoDeAtualizacaoDoCanvas)
         }
 
         function changeValues(){
             tempo += tempoDeAtualizacaoDoCanvas/velocidadeAnimacao;
             massaPosicaoX = massaPosicaoXOriginal + x0 * Math.sin(Math.sqrt(kMola) * tempo / Math.sqrt(massa)) + xp * Math.cos(Math.sqrt(kMola) * tempo / Math.sqrt(massa));
-        }
-
-
-        /* Funcao para permitir ao usuario controlar algumas caracteristicas da simulacao */
-        function keyDown(e){
-//            console.log(e.keyCode);
-            if(e.keyCode == 32) {
-
-                if(drawInterval){
-                    clearInterval(drawInterval);
-                    drawInterval = false;
-                }else{
-                    drawInterval = setInterval(draw, tempoDeAtualizacaoDoCanvas);
-                }
-            }
-
-
-            if(e.keyCode == 37){
-                if(velocidadeAnimacao < 400) {
-                    velocidadeAnimacao += 20;
-                }
-            }
-
-            if(e.keyCode == 39){
-                if(velocidadeAnimacao > 60) {
-                    velocidadeAnimacao -= 20;
-                }
-            }
-            console.log(velocidadeAnimacao);
         }
 
         function draw(){
