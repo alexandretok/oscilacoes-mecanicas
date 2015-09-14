@@ -67,7 +67,7 @@
                 <label for="velocidade">Velocidade da Simulacao:</label> <input type="range" max="500" min="100" id="velocidade">
             </p>
             <p>
-                <label for="posicaoInicial">Posição Inicial:</label> <input type="range" max="100" min="0" oninput="$('#posicaoInicial').change()" id="posicaoInicial">
+                <label for="posicaoInicial">Posição Inicial:</label> <input type="range" max="200" min="0" oninput="$('#posicaoInicial').change()" id="posicaoInicial">
             </p>
             <p>
                 <label for="velocidadeInicial">Velocidade Inicial:</label> <input type="range" max="100" min="0" oninput="$('#velocidadeInicial').change()" id="velocidadeInicial">
@@ -97,11 +97,13 @@
             $('#posicaoInicial').change(function(){
                 x0 = this.value;
                 massaPosicaoX = parseInt(x0) + parseInt(massaPosicaoXOriginal);
-                draw();
+                tempo = tempoReal = 0;
+                draw(0);
             });
             $('#velocidadeInicial').change(function(){
                 xp = this.value;
                 massaPosicaoX = parseInt(x0) + parseInt(massaPosicaoXOriginal);
+                tempo = tempoReal = 0;
                 draw();
             });
             $('#velocidade').change(function(){
@@ -120,7 +122,7 @@
                 }
             });
         });
-        var canvasSimulacao, canvasGrafico, contextoGrafico, rangeKMola, imgCaixa, velocidadeAnimacao, drawInterval,  contextoSimulacao, tempo, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp;
+        var canvasSimulacao, canvasGrafico, contextoGrafico, rangeKMola, imgCaixa, velocidadeAnimacao, drawInterval,  contextoSimulacao, tempo, tempoReal, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp;
 
         function inicializar() {
             massaAltura = 200;
@@ -136,8 +138,8 @@
             massaPosicaoX = x0 + massaPosicaoXOriginal;
 
             tempoDeAtualizacaoDoCanvas = 30;
-            velocidadeAnimacao = 150; /* Padrao = 150 */
-            tempo = 0;
+            velocidadeAnimacao = 300; /* Padrao = 150 */
+            tempo = tempoReal = 0;
 
             canvasSimulacao = document.getElementById("canvasSimulacao");
             contextoSimulacao = canvasSimulacao.getContext("2d");
@@ -152,23 +154,28 @@
             draw();
         }
 
-        function tick(){
-            tempo += tempoDeAtualizacaoDoCanvas/velocidadeAnimacao;
+        function tick(noNeedToTick){
+            if(noNeedToTick == null) {
+                tempo += tempoDeAtualizacaoDoCanvas / velocidadeAnimacao;
+                tempoReal += tempoDeAtualizacaoDoCanvas / 1000;
+            }
+            console.log(tempo);
             massaPosicaoX = massaPosicaoXOriginal + x0 * Math.sin(Math.sqrt(kMola) * tempo / Math.sqrt(massa)) + xp * Math.cos(Math.sqrt(kMola) * tempo / Math.sqrt(massa));
         }
 
-        function draw(){
+        function draw(noNeedToTick){
             contextoSimulacao.clearRect(0, 0, canvasSimulacao.width, canvasSimulacao.height); /* Limpa a tela */
-            contextoSimulacao.fillRect(massaPosicaoX, canvasSimulacao.height - massaAltura, massaLargura, massaAltura); /* Desenha a posicao do jogar */
+            contextoSimulacao.fillRect(massaPosicaoX, canvasSimulacao.height - massaAltura, massaLargura, massaAltura); /* Desenha a posicao da massa */
             contextoSimulacao.drawImage(imgCaixa, massaPosicaoX, canvasSimulacao.height - massaAltura); /* Coloca a imagem da caixa em cima do retangulo */
 
             /*Desenhando a escala na parte superior*/
             /*Cada ponto na escala equivale a 100px */
             contextoSimulacao.beginPath();
             alturaEscala = canvasSimulacao.height - massaAltura - 5; /* Desenha a escala 5 pixels acima da massa */
-            contextoSimulacao.moveTo(0, alturaEscala);
-            contextoSimulacao.lineTo(canvasSimulacao.width, alturaEscala);
-            for(i=0;i<=canvasSimulacao.width;i+=100){
+            var inicioEscala = 300;
+            contextoSimulacao.moveTo(inicioEscala, alturaEscala);
+            contextoSimulacao.lineTo(canvasSimulacao.width - 100, alturaEscala);
+            for(i=inicioEscala;i<=canvasSimulacao.width - 100;i+=100){
                 /* A cada 100 pixels desenha uma marca na escala */
                 contextoSimulacao.moveTo(i, alturaEscala);
                 /* Para que os numeros fiquem alinhados com os tracos, precisamos voltar alguns pixels antes de escrever */
@@ -179,7 +186,7 @@
                 else if(i == canvasSimulacao.width)
                     back = i - 20; /* Na ultima marca, escrever 20 pixels a esquerda, para nao cortar o numero */
                 else back = i - 5; /* Nas outras marcas, escrever 5 pixels a esquerda, para alinhar com o traco */
-                contextoSimulacao.fillText(i/100, back, alturaEscala - 10);
+                contextoSimulacao.fillText((i - massaPosicaoXOriginal)/100 + "", back, alturaEscala - 10);
                 contextoSimulacao.moveTo(i, alturaEscala - 5);
                 contextoSimulacao.lineTo(i, alturaEscala + 5);
             }
@@ -192,16 +199,16 @@
             xAtual = 0;
             yAtual = canvasSimulacao.height - massaAltura/2;
             y0 = yAtual;
-            nAspirais = 15;
+            nAspirais = 10;
             comprimentoAspiral = 8;
             deslocamentoXPixels = (massaPosicaoX - massaPosicaoXOriginal) + 100;
             deslocamentoXPorAspiral = deslocamentoXPixels/(nAspirais*2);
             deslocamentoYPorAspiral = comprimentoAspiral*comprimentoAspiral - Math.sqrt(Math.pow(deslocamentoXPorAspiral, 2));
 
             contextoSimulacao.moveTo(xAtual, yAtual);
-            contextoSimulacao.lineTo(xAtual += 200, yAtual);
+            contextoSimulacao.lineTo(xAtual += 50, yAtual);
 
-            deslocamentoXPorAspiral += 2;
+            deslocamentoXPorAspiral += 9;
 
             for(i=0;i<nAspirais/2;i++) {
                 /* Desenha as espirais */
@@ -222,7 +229,39 @@
             contextoSimulacao.lineTo(massaPosicaoX, yAtual);
             contextoSimulacao.stroke();
 
-            tick();
+            if(tempo == 0) {
+                /* Desenhando o grafico */
+                contextoGrafico.clearRect(0, 0, canvasGrafico.width, canvasGrafico.height);
+                /* Limpa a tela */
+                contextoGrafico.beginPath();
+                contextoGrafico.fillText("Grafico da Posicao", canvasGrafico.width / 3, 15);
+                /* Desenhando o eixo t */
+                contextoGrafico.moveTo(20, canvasGrafico.height / 2);
+                contextoGrafico.lineTo(canvasGrafico.width - 20, canvasGrafico.height / 2);
+                contextoGrafico.fillText("t", canvasGrafico.width - 10, canvasGrafico.height / 2 + 5);
+                /* Desenhando o eixo x */
+                contextoGrafico.moveTo(20, 0);
+                contextoGrafico.lineTo(20, canvasGrafico.height);
+                contextoGrafico.fillText("x", 5, canvasGrafico.height / 2 + 5);
+            }
+
+            /* Desenhando posicao de x no grafico */
+            var ponto = -(massaPosicaoX - massaPosicaoXOriginal)/100;
+            contextoGrafico.fillRect(tempo*10 + 20, ponto*40 + canvasGrafico.height/2, 3, 3);
+            var inteiro = Math.floor(tempoReal);
+            var decimal = tempoReal - inteiro;
+            if(decimal >= 0.970){
+                contextoGrafico.moveTo(tempo*10 + 20, canvasGrafico.height / 2 - 5);
+                contextoGrafico.lineTo(tempo*10 + 20, canvasGrafico.height / 2 + 5);
+                contextoGrafico.font = "bold 12px Arial";
+                contextoGrafico.fillStyle = "red";
+                contextoGrafico.fillText(inteiro + 1 + "", tempo*10 + 20 - 5, canvasGrafico.height / 2 + 20);
+                contextoGrafico.fillStyle = "black";
+            }
+
+            contextoGrafico.stroke();
+
+            tick(noNeedToTick);
         }
     </script>
 </body>
