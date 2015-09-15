@@ -9,9 +9,6 @@
             background-color: #E6F9FF;
             padding: 10px;
         }
-        #crate {
-            display: none;
-        }
         #simulacao {
 
         }
@@ -74,7 +71,6 @@
             </p>
         </div>
     </div>
-    <img id="crate" src="crate.png">
     <script type="text/javascript">
         $(document).ready(function(){
             inicializar();
@@ -119,7 +115,9 @@
                 }
             });
         });
-        var canvasSimulacao, canvasGrafico, contextoGrafico, rangeKMola, imgCaixa, velocidadeAnimacao, drawInterval,  contextoSimulacao, tempo, tempoReal, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa, massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp;
+        var canvasSimulacao, canvasGrafico, contextoGrafico, imgCaixa, rangeKMola, imgCaixa, velocidadeAnimacao, drawInterval,
+                contextoSimulacao, tempo, tempoReal, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa,
+                massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp;
 
         function inicializar() {
             massaAltura = 200;
@@ -146,7 +144,15 @@
             contextoGrafico = canvasGrafico.getContext("2d");
             contextoGrafico.font = "bold 16px Arial";
 
-            imgCaixa = document.getElementById("crate");
+            // load image from data url
+            imgCaixa = new Image();
+            imgCaixa.carregou = 0;
+            imgCaixa.onload = function() {
+                contextoSimulacao.drawImage(this, massaPosicaoX, canvasSimulacao.height - massaAltura);
+                imgCaixa.carregou = 1;
+            };
+
+            imgCaixa.src = "crate.png";
 
             draw();
         }
@@ -162,7 +168,8 @@
         function draw(noNeedToTick){
             contextoSimulacao.clearRect(0, 0, canvasSimulacao.width, canvasSimulacao.height); /* Limpa a tela */
             contextoSimulacao.fillRect(massaPosicaoX, canvasSimulacao.height - massaAltura, massaLargura, massaAltura); /* Desenha a posicao da massa */
-            contextoSimulacao.drawImage(imgCaixa, massaPosicaoX, canvasSimulacao.height - massaAltura); /* Coloca a imagem da caixa em cima do retangulo */
+            if(imgCaixa.carregou)
+                contextoSimulacao.drawImage(imgCaixa, massaPosicaoX, canvasSimulacao.height - massaAltura); /* Coloca a imagem da caixa em cima do retangulo */
 
             /*Desenhando a escala na parte superior*/
             /*Cada ponto na escala equivale a 100px */
