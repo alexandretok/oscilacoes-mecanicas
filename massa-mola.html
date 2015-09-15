@@ -156,7 +156,6 @@
                 tempo += tempoDeAtualizacaoDoCanvas / velocidadeAnimacao;
                 tempoReal += tempoDeAtualizacaoDoCanvas / 1000;
             }
-            console.log(tempo);
             massaPosicaoX = massaPosicaoXOriginal + xp * Math.sin(Math.sqrt(kMola) * tempo / Math.sqrt(massa)) + x0 * Math.cos(Math.sqrt(kMola) * tempo / Math.sqrt(massa));
         }
 
@@ -223,9 +222,13 @@
             contextoSimulacao.fillText("| k = " + kMola + " N/m", 590, 25);
             contextoSimulacao.fillText("| m = " + massa + " kg", 720, 25);
 //            contextoSimulacao.fillText("m = " + massa + " kg", massaPosicaoX - 100, y0 - 10);
+            contextoSimulacao.fillText("| t = " + tempoReal.toFixed(2) + " s", 840, 25);
+
 
             contextoSimulacao.lineTo(massaPosicaoX, yAtual);
             contextoSimulacao.stroke();
+
+            /* <<<<<<<<<<<<<<<<< GRAFICO >>>>>>>>>>>>>>>>>> */
 
             if(tempo == 0) {
                 /* Desenhando o grafico */
@@ -234,29 +237,39 @@
                 contextoGrafico.beginPath();
                 contextoGrafico.fillText("Grafico da Posicao", canvasGrafico.width / 3, 15);
                 /* Desenhando o eixo t */
-                contextoGrafico.moveTo(20, canvasGrafico.height / 2);
-                contextoGrafico.lineTo(canvasGrafico.width - 20, canvasGrafico.height / 2);
+                contextoGrafico.moveTo(20, canvasGrafico.height / 2 + 1);
+                contextoGrafico.lineTo(canvasGrafico.width - 25, canvasGrafico.height / 2 + 1);
                 contextoGrafico.fillText("t", canvasGrafico.width - 10, canvasGrafico.height / 2 + 5);
+                /* Desenhando escala do eixo t */
+                /* Descobri, por observacao que cada segundo em tempo real equivale a quase exatamente 33 pixels */
+                for(var i=33; i<canvasGrafico.width; i+=33){
+                    contextoGrafico.moveTo(i + 25, canvasGrafico.height / 2 - 5);
+                    contextoGrafico.lineTo(i + 25, canvasGrafico.height / 2 + 5);
+                    contextoGrafico.font = "bold 12px Arial";
+                    contextoGrafico.fillStyle = "red";
+                    contextoGrafico.fillText(i/33 + "", i + 25 - 5, canvasGrafico.height / 2 + 20);
+                }
+                contextoGrafico.fillStyle = "black";
                 /* Desenhando o eixo x */
                 contextoGrafico.moveTo(20, 0);
                 contextoGrafico.lineTo(20, canvasGrafico.height);
                 contextoGrafico.fillText("x", 5, canvasGrafico.height / 2 + 5);
+                /* Desenhando escala do eixo X */
+                for(var j=-300;j<=300; j+=100){
+                    if(j == 0) continue;
+                    contextoGrafico.moveTo(15, (canvasGrafico.height / 2) + j/2.52);
+                    contextoGrafico.lineTo(25, (canvasGrafico.height / 2) + j/2.52);
+                    contextoGrafico.font = "bold 12px Arial";
+                    contextoGrafico.fillStyle = "red";
+                    contextoGrafico.fillText(j/100 + "", 0, (canvasGrafico.height / 2) + j/2.52 + 5 + (j == -300 ? 5 : 0) + (j == 300 ? -5 : 0));
+                }
+                contextoGrafico.fillStyle = "black";
             }
 
             /* Desenhando posicao de x no grafico */
             var ponto = -(massaPosicaoX - massaPosicaoXOriginal)/100;
-            contextoGrafico.fillRect(tempo*10 + 20, ponto*50 + canvasGrafico.height/2, 3, 3);
-            var inteiro = Math.floor(tempoReal);
-            var decimal = tempoReal - inteiro;
-            if(decimal >= 0.970){
-                contextoGrafico.moveTo(tempo*10 + 20, canvasGrafico.height / 2 - 5);
-                contextoGrafico.lineTo(tempo*10 + 20, canvasGrafico.height / 2 + 5);
-                contextoGrafico.font = "bold 12px Arial";
-                contextoGrafico.fillStyle = "red";
-                contextoGrafico.fillText(inteiro + 1 + "", tempo*10 + 20 - 5, canvasGrafico.height / 2 + 20);
-                contextoGrafico.fillStyle = "black";
-            }
-
+            if(tempoReal <= 13.00)
+                contextoGrafico.fillRect(tempo*10 + 20, ponto*40 + canvasGrafico.height/2 - 1, 3, 3);
             contextoGrafico.stroke();
 
             tick(noNeedToTick);
