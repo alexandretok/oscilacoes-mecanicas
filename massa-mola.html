@@ -160,7 +160,7 @@
                 tempoReal += tempoDeAtualizacaoDoCanvas / 1000;
             }
             console.log(tempo);
-            massaPosicaoX = massaPosicaoXOriginal + x0 * Math.sin(Math.sqrt(kMola) * tempo / Math.sqrt(massa)) + xp * Math.cos(Math.sqrt(kMola) * tempo / Math.sqrt(massa));
+            massaPosicaoX = massaPosicaoXOriginal + xp * Math.sin(Math.sqrt(kMola) * tempo / Math.sqrt(massa)) + x0 * Math.cos(Math.sqrt(kMola) * tempo / Math.sqrt(massa));
         }
 
         function draw(noNeedToTick){
@@ -247,7 +247,7 @@
 
             /* Desenhando posicao de x no grafico */
             var ponto = -(massaPosicaoX - massaPosicaoXOriginal)/100;
-            contextoGrafico.fillRect(tempo*10 + 20, ponto*40 + canvasGrafico.height/2, 3, 3);
+            contextoGrafico.fillRect(tempo*10 + 20, ponto*50 + canvasGrafico.height/2, 3, 3);
             var inteiro = Math.floor(tempoReal);
             var decimal = tempoReal - inteiro;
             if(decimal >= 0.970){
