@@ -58,13 +58,10 @@
         </div>
         <div id="controles">
             <p>
-                <label for="kMola">Coeficiente de Elasticidade:</label> <input type="range" max="100" min="1" id="kMola">
+                <label for="kMola">Coef. de Elasticidade:</label> <input type="range" oninput="$('#kMola').change()" max="100" min="1" id="kMola">
             </p>
             <p>
-                <label for="massa">Massa:</label> <input type="range" max="100" min="1" id="massa">
-            </p>
-            <p>
-                <label for="velocidade">Velocidade da Simulacao:</label> <input type="range" max="500" min="100" id="velocidade">
+                <label for="massa">Massa:</label> <input type="range" oninput="$('#massa').change()" max="100" min="1" id="massa">
             </p>
             <p>
                 <label for="posicaoInicial">Posição Inicial:</label> <input type="range" max="200" min="0" oninput="$('#posicaoInicial').change()" id="posicaoInicial">
@@ -84,15 +81,18 @@
             /* Iniciando os controles dos valores do sistema */
             $('#kMola').val(kMola);
             $('#massa').val(massa);
-            $('#velocidade').val(velocidadeAnimacao);
             $('#posicaoInicial').val(x0);
             $('#velocidadeInicial').val(xp);
             /* Eventos de alteracao dos valores do sistema */
             $('#kMola').change(function(){
                 kMola = this.value;
+                tempo = tempoReal = 0;
+                draw(0);
             });
             $('#massa').change(function(){
                 massa = this.value;
+                tempo = tempoReal = 0;
+                draw(0);
             });
             $('#posicaoInicial').change(function(){
                 x0 = this.value;
@@ -105,9 +105,6 @@
                 massaPosicaoX = parseInt(x0) + parseInt(massaPosicaoXOriginal);
                 tempo = tempoReal = 0;
                 draw();
-            });
-            $('#velocidade').change(function(){
-                velocidadeAnimacao = this.value;
             });
             $('#pause').click(function () {
                 if(drawInterval){
@@ -128,7 +125,7 @@
             massaAltura = 200;
             massaLargura = 200;
 
-            x0 = 0;   /* Posição inicial */
+            x0 = 100;   /* Posição inicial */
             xp = 0;   /* Velocidade inicial */
 
             kMola = 10;
@@ -220,11 +217,12 @@
 
 
             /* Escrevendo informacoes do sistema */
-            contextoSimulacao.fillText("k = " + kMola + " N/m", 10, y0 - 10);
-            contextoSimulacao.fillText("m = " + massa + " kg", massaPosicaoX - 100, y0 - 10);
-            contextoSimulacao.fillText("X0 = " + x0/100 + " cm", 400, 25);
-            contextoSimulacao.fillText("Xp0 = " + xp/100 + " cm/s", 550, 25);
-            contextoSimulacao.fillText("Equação do sistema:   m۰Ẍ + K۰x = 0", 10, 25);
+            contextoSimulacao.fillText("Eq. do sistema: m۰Ẍ + K۰x = 0", 10, 25);
+            contextoSimulacao.fillText("| X0 = " + x0/100 + " cm", 295, 25);
+            contextoSimulacao.fillText("| Xp0 = " + xp/100 + " cm/s", 430, 25);
+            contextoSimulacao.fillText("| k = " + kMola + " N/m", 590, 25);
+            contextoSimulacao.fillText("| m = " + massa + " kg", 720, 25);
+//            contextoSimulacao.fillText("m = " + massa + " kg", massaPosicaoX - 100, y0 - 10);
 
             contextoSimulacao.lineTo(massaPosicaoX, yAtual);
             contextoSimulacao.stroke();
