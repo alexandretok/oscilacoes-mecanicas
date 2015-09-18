@@ -148,7 +148,7 @@
             imgCaixa = new Image();
             imgCaixa.carregou = 0;
             imgCaixa.onload = function() {
-                contextoSimulacao.drawImage(this, massaPosicaoX, canvasSimulacao.height - massaAltura);
+                contextoSimulacao.drawImage(this, massaPosicaoXOriginal + x0, canvasSimulacao.height - massaAltura);
                 imgCaixa.carregou = 1;
             };
 
