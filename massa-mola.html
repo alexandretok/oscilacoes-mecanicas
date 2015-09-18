@@ -29,7 +29,7 @@
             height: 30px;
             width: 80px;
         }
-        #velocidade, label[for="velocidade"] {
+        label[for="velocidade"] {
             display: none;
         }
         #controles p {
@@ -82,24 +82,24 @@
             /* Eventos de alteracao dos valores do sistema */
             $('#kMola').change(function(){
                 kMola = this.value;
-                tempo = tempoReal = 0;
+                tempo = 0;
                 draw(0);
             });
             $('#massa').change(function(){
                 massa = this.value;
-                tempo = tempoReal = 0;
+                tempo = 0;
                 draw(0);
             });
             $('#posicaoInicial').change(function(){
                 x0 = this.value;
                 massaPosicaoX = parseInt(x0) + parseInt(massaPosicaoXOriginal);
-                tempo = tempoReal = 0;
+                tempo = 0;
                 draw(0);
             });
             $('#velocidadeInicial').change(function(){
                 xp = this.value;
                 massaPosicaoX = parseInt(x0) + parseInt(massaPosicaoXOriginal);
-                tempo = tempoReal = 0;
+                tempo = 0;
                 draw();
             });
             $('#pause').click(function () {
@@ -115,8 +115,8 @@
                 }
             });
         });
-        var canvasSimulacao, canvasGrafico, contextoGrafico, imgCaixa, rangeKMola, imgCaixa, velocidadeAnimacao, drawInterval,
-                contextoSimulacao, tempo, tempoReal, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa,
+        var canvasSimulacao, canvasGrafico, contextoGrafico, rangeKMola, imgCaixa, velocidadeAnimacao, drawInterval,
+                contextoSimulacao, tempoReal, tempoDeAtualizacaoDoCanvas, massaAltura, massaLargura, massa,
                 massaPosicaoX, massaPosicaoXOriginal, massaVelocidade, kMola, x0, xp, pontoAnterior;
 
         function inicializar() {
@@ -124,9 +124,9 @@
             massaLargura = 200;
 
             x0 = 100;   /* Posição inicial */
-            xp = 0;   /* Velocidade inicial */
+            xp = 50;   /* Velocidade inicial */
 
-            kMola = 10;
+            kMola = 50;
             massa = 10;
 
             massaPosicaoXOriginal = 600;
@@ -134,7 +134,7 @@
 
             tempoDeAtualizacaoDoCanvas = 30;
             velocidadeAnimacao = 300; /* Padrao = 150 */
-            tempo = tempoReal = 0;
+            tempo = tempo = 0;
 
             canvasSimulacao = document.getElementById("canvasSimulacao");
             contextoSimulacao = canvasSimulacao.getContext("2d");
@@ -157,10 +157,10 @@
             draw();
         }
 
+        /* Essa função é responsável por calcular a nova posição da massa e de gerenciar o avanço do tempo durante a simulação */
         function tick(noNeedToTick){
             if(noNeedToTick == null) {
-                tempo += tempoDeAtualizacaoDoCanvas / velocidadeAnimacao;
-                tempoReal += tempoDeAtualizacaoDoCanvas / 1000;
+                tempo += tempoDeAtualizacaoDoCanvas / 1000;
             }
             massaPosicaoX = massaPosicaoXOriginal + xp * Math.sin(Math.sqrt(kMola) * tempo / Math.sqrt(massa)) + x0 * Math.cos(Math.sqrt(kMola) * tempo / Math.sqrt(massa));
         }
@@ -204,8 +204,8 @@
             y0 = yAtual;
             nAspirais = 10;
             comprimentoAspiral = 8;
-            deslocamentoXPixels = (massaPosicaoX - massaPosicaoXOriginal) + 100;
-            deslocamentoXPorAspiral = deslocamentoXPixels/(nAspirais*2);
+            deslocamentoX = (massaPosicaoX - massaPosicaoXOriginal) + 100;
+            deslocamentoXPorAspiral = deslocamentoX/(nAspirais*2);
             deslocamentoYPorAspiral = comprimentoAspiral*comprimentoAspiral - Math.sqrt(Math.pow(deslocamentoXPorAspiral, 2));
 
             contextoSimulacao.moveTo(xAtual, yAtual);
@@ -229,7 +229,7 @@
             contextoSimulacao.fillText("| k = " + kMola + " N/m", 590, 25);
             contextoSimulacao.fillText("| m = " + massa + " kg", 720, 25);
 //            contextoSimulacao.fillText("m = " + massa + " kg", massaPosicaoX - 100, y0 - 10);
-            contextoSimulacao.fillText("| t = " + tempoReal.toFixed(2) + " s", 840, 25);
+            contextoSimulacao.fillText("| t = " + tempo.toFixed(2) + " s", 840, 25);
 
 
             contextoSimulacao.lineTo(massaPosicaoX, yAtual);
@@ -248,7 +248,7 @@
                 contextoGrafico.lineTo(canvasGrafico.width - 25, canvasGrafico.height / 2 + 1);
                 contextoGrafico.fillText("t", canvasGrafico.width - 10, canvasGrafico.height / 2 + 5);
                 /* Desenhando escala do eixo t */
-                /* Descobri, por observacao que cada segundo em tempo real equivale a quase exatamente 33 pixels */
+                /* Cada segundo equivale a 33 pixels (na verdade 33,33) */
                 for(var i=33; i<canvasGrafico.width; i+=33){
                     contextoGrafico.moveTo(i + 25, canvasGrafico.height / 2 - 5);
                     contextoGrafico.lineTo(i + 25, canvasGrafico.height / 2 + 5);
@@ -273,10 +273,10 @@
                 contextoGrafico.fillStyle = "black";
             }
 
-            /* Desenhando posicao de x no grafico */
-            if(tempoReal <= 13.00) {
+            /* Plotando o ponto da posicao de x no grafico */
+            if(tempo <= 13.00) {
                 var ponto = -(massaPosicaoX - massaPosicaoXOriginal)/100;
-//                contextoGrafico.fillRect(tempo * 10 + 20, ponto * 40 + canvasGrafico.height / 2 - 1, 3, 3);
+//                contextoGrafico.fillRect(tempoReal * 10 + 20, ponto * 40 + canvasGrafico.height / 2 - 1, 3, 3);
                 if(pontoAnterior != null){
                     contextoGrafico.lineWidth = 0.5;
                     contextoGrafico.moveTo(pontoAnterior[0], pontoAnterior[1]);
